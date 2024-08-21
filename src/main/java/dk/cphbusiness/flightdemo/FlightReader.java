@@ -29,6 +29,7 @@ public class FlightReader {
         try {
             List<DTOs.FlightDTO> flightList = flightReader.getFlightsFromFile("flights.json");
             List<DTOs.FlightInfo> flightInfoList = flightReader.getFlightInfoDetails(flightList);
+
             flightInfoList.forEach(f->{
                 System.out.println("\n"+f);
                 System.out.println((Duration.between(f.getDeparture(),f.getArrival())).toMinutes());
@@ -42,6 +43,7 @@ public class FlightReader {
 
                 averageDurationByAirline.forEach((airline, avgDuration) ->
                         System.out.println("Airline: " + airline + ", Average Flight Duration: " + avgDuration + " minutes"));
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,5 +86,30 @@ public class FlightReader {
         return flightList;
     }
 
+    // New method to calculate the total flight time for a specific airline
+    public Duration calculateTotalFlightTimeForAirline(List<DTOs.FlightDTO> flightList, String airlineName) {
+        Duration totalFlightTime = flightList.stream()
+                .filter(flight -> flight.getAirline() != null
+                        && flight.getAirline().getName() != null
+                        && flight.getAirline().getName().equalsIgnoreCase(airlineName))
+                .map(flight -> Duration.between(flight.getDeparture().getScheduled(), flight.getArrival().getScheduled()))
+                .reduce(Duration::plus)
+                .orElse(Duration.ZERO); // Return zero if there are no matching flights
 
+        System.out.println("Total flight time for " + airlineName + ": "
+                + totalFlightTime.toHoursPart() + " hours "
+                + totalFlightTime.toMinutesPart() + " minutes");
+
+        return totalFlightTime;
+    }
 }
+
+
+
+
+
+
+
+
+
+
