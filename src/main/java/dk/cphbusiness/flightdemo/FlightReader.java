@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Purpose:
@@ -28,17 +29,28 @@ public class FlightReader {
         try {
             List<DTOs.FlightDTO> flightList = flightReader.getFlightsFromFile("flights.json");
             List<DTOs.FlightInfo> flightInfoList = flightReader.getFlightInfoDetails(flightList);
-            flightInfoList.forEach(f -> {
-                System.out.println("\n" + f);
-            });
 
-            // Calculate total flight time for a specific airline
-            flightReader.calculateTotalFlightTimeForAirline(flightList, "Royal Jordanian");
+            flightInfoList.forEach(f->{
+                System.out.println("\n"+f);
+                System.out.println((Duration.between(f.getDeparture(),f.getArrival())).toMinutes());
+            });
+                List <DTOs.FlightInfo> filteredList = flightInfoList.stream().filter(flightInfo -> flightInfo.getAirline() != null)
+                        .collect(Collectors.toList());
+
+                Map<String, Double> averageDurationByAirline = filteredList.stream()
+                        .collect(Collectors.groupingBy(DTOs.FlightInfo::getAirline,
+                                Collectors.averagingDouble(flightInfo -> flightInfo.getDuration().toMinutes())));
+
+                averageDurationByAirline.forEach((airline, avgDuration) ->
+                        System.out.println("Airline: " + airline + ", Average Flight Duration: " + avgDuration + " minutes"));
 
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+
     }
 
 
