@@ -44,6 +44,8 @@ public class FlightReader {
                 averageDurationByAirline.forEach((airline, avgDuration) ->
                         System.out.println("Airline: " + airline + ", Average Flight Duration: " + avgDuration + " minutes"));
 
+            flightReader.calculateTotalFlightTimeForAirline(flightList, "Royal Jordanian");
+
 
         } catch (IOException e) {
             e.printStackTrace();
